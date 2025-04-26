@@ -3,7 +3,7 @@ from pydantic import BaseModel
 import torch
 from torch.serialization import safe_globals
 from sklearn.preprocessing import LabelEncoder
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel # type: ignore
 import torch.nn as nn
 from contextlib import asynccontextmanager
 
@@ -42,6 +42,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Multi-Task Model API"}
+
 @app.post("/predict", response_model=PredictResponse)
 async def predict(req: PredictRequest):
     toks = tokenizer(req.text, return_tensors="pt", truncation=True, padding=True).to(device)
@@ -50,6 +54,16 @@ async def predict(req: PredictRequest):
     g = int(lc.argmax(1).item())
     p = int(lu.argmax(1).item())
     return PredictResponse(genre=le_cat.inverse_transform([g])[0], priority=le_urg.inverse_transform([p])[0])
+
+@app.post("/batch", response_model=list[PredictResponse])
+async def batch_predict(req: list[PredictRequest]):
+    texts = [r.text for r in req]
+    toks = tokenizer(texts, return_tensors="pt", truncation=True, padding=True).to(device)
+    with torch.no_grad():
+        lc, lu = model(**toks)
+    genres = le_cat.inverse_transform(lc.argmax(1).cpu().numpy())
+    priorities = le_urg.inverse_transform(lu.argmax(1).cpu().numpy())
+    return [PredictResponse(genre=g, priority=p) for g, p in zip(genres, priorities)]
 
 if __name__ == "__main__":
     import uvicorn
