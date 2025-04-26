@@ -1,0 +1,5 @@
+id,complaint_text,category,urgency
+1,"I'm having trouble registering for CHEM 102. The system says it's full, but it's a required course for my major and I need it this semester. Is there any chance of getting an override or joining a waitlist? Need help asap.",Academic,Medium
+2,"Just wanted to note that the lightbulb above the study carrels on the 4th floor of the main library seems to be burnt out. It's pretty dim over there. Not urgent, but would be nice to get fixed when possible.",Facilities,Low
+3,"There's been no hot water in Cedar Hall, wing B, for over 24 hours now. It's getting really difficult to shower, especially with the cold weather. Can someone please look into this urgently? We need it fixed.",Housing,High
+4,"URGENT!! I am trying to take my midterm exam online for PSYC 210 right now and the exam portal just crashed. The exam is timed and I can't get back in. Please help immediately, I don't want to fail because of a technical issue!",IT Support,Critical
