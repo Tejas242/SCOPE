@@ -11,3 +11,13 @@ wheels/
 
 # ML files/folders
 model/*
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# VS Code settings
+.vscode/
+
+# sqlite database
+*.sqlite3
+*.db
