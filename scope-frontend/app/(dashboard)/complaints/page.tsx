@@ -315,7 +315,7 @@ export default function ComplaintsPage() {
         </Alert>
       )}
 
-      <div className="bg-card border rounded-lg p-5 shadow-sm">
+      <div className="bg-card dark:bg-card/80 border dark:border-border/30 rounded-lg p-5 shadow-sm dark:shadow-md">
         <div className="flex flex-col md:flex-row gap-4 justify-between">
           <form onSubmit={handleSearch} className="flex gap-2 flex-1">
             <div className="relative flex-1 max-w-sm">
@@ -324,10 +324,10 @@ export default function ComplaintsPage() {
                 placeholder="Search complaints..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
+                className="pl-9 dark:bg-muted/10 dark:border-border/50"
               />
             </div>
-            <Button type="submit" variant="secondary">
+            <Button type="submit" variant="secondary" className="dark:bg-muted/30 dark:hover:bg-muted/50 dark:text-foreground">
               Search
             </Button>
           </form>
@@ -338,7 +338,7 @@ export default function ComplaintsPage() {
               value={categoryFilter || 'all'} 
               onValueChange={(value) => setCategoryFilter(value === 'all' ? null : value as ComplaintCategory)}
             >
-              <SelectTrigger className="w-[150px] h-9 bg-background">
+              <SelectTrigger className="w-[150px] h-9 bg-background dark:bg-muted/10 dark:border-border/50">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>

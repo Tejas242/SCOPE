@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, Sun, Moon } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { User, UserRole } from '@/types';
+import { useTheme } from 'next-themes';
 import { showToast } from '@/lib/toast';
 
 interface LoginResponse {
@@ -96,18 +97,21 @@ export default function LoginPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background relative">
+      {/* Theme toggle button */}
+      <ThemeToggleButton />
+      
       {/* Abstract Background Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] dark:[mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#fff_30%,transparent_100%)] pointer-events-none"></div>
       
       {/* Gradient Accent */}
-      <div className="absolute -top-40 -left-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -top-40 -left-40 w-80 h-80 bg-primary/10 dark:bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-primary/10 dark:bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
       
       {isRedirecting && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-card p-8 rounded-lg shadow-lg flex flex-col items-center space-y-4 border">
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-card dark:bg-card/90 p-8 rounded-lg shadow-lg dark:shadow-2xl flex flex-col items-center space-y-4 border dark:border-border/50">
             <div className="relative inline-flex">
-              <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
+              <div className="absolute inset-0 bg-primary/20 dark:bg-primary/30 blur-xl rounded-full"></div>
               <Loader2 className="h-12 w-12 animate-spin text-primary relative" />
             </div>
             <p className="text-lg font-medium">Login successful!</p>
@@ -201,8 +205,7 @@ export default function LoginPage() {
             </CardContent>
             <CardFooter className="flex flex-col border-t pt-6">
               <p className="text-xs text-center text-muted-foreground">
-                This is a demo application. Use <span className="font-mono bg-muted px-1 py-0.5 rounded">admin@scope.edu / password123</span> to login as admin.
-              </p>
+                This is a demo application. Use <span className="font-mono bg-muted px-1 py-0.5 rounded">admin@example.com / password123</span> to login as admin.</p>
             </CardFooter>
           </Card>
         </div>
@@ -210,3 +213,21 @@ export default function LoginPage() {
     </div>
   );
 }
+
+// Theme toggle button component
+const ThemeToggleButton = () => {
+  const { theme, setTheme } = useTheme();
+  
+  return (
+    <Button 
+      variant="outline" 
+      size="icon" 
+      className="absolute top-4 right-4 z-50 rounded-full bg-background/80 backdrop-blur-sm dark:bg-background/50"
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      aria-label="Toggle theme"
+    >
+      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+    </Button>
+  );
+};

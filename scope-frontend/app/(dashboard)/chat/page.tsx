@@ -172,10 +172,10 @@ export default function ChatPage() {
                 <div
                   className={`rounded-2xl px-3.5 py-2.5 ${
                     msg.role === 'user'
-                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      ? 'bg-primary text-primary-foreground shadow-sm dark:shadow-md dark:shadow-primary/10'
                       : msg.isLoading
-                        ? 'bg-muted/20 border border-muted/30 animate-pulse'
-                        : 'bg-muted/10 border border-muted/20 shadow-sm' 
+                        ? 'bg-muted/20 dark:bg-muted/10 border border-muted/30 dark:border-muted/20 animate-pulse'
+                        : 'bg-muted/10 dark:bg-muted/5 border border-muted/20 dark:border-muted/10 shadow-sm dark:shadow-md' 
                   }`}
                 >
                   {msg.isLoading ? (
@@ -237,7 +237,7 @@ export default function ChatPage() {
         </div>
         
         {/* Message Input - More clean and modern */}
-        <div className="px-4 py-3 backdrop-blur-sm bg-background/80 border-t">
+        <div className="px-4 py-3 backdrop-blur-sm bg-background/80 dark:bg-background/50 border-t dark:border-t-border/30">
           <form onSubmit={handleSubmit} className="mx-auto max-w-4xl flex items-end gap-2 relative">
             <div className="relative w-full">
               <Textarea
@@ -245,7 +245,7 @@ export default function ChatPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask a question..."
-                className="resize-none py-3 pr-12 min-h-[48px] max-h-32 focus-visible:ring-primary/40 text-sm bg-muted/10 border rounded-2xl"
+                className="resize-none py-3 pr-12 min-h-[48px] max-h-32 focus-visible:ring-primary/40 text-sm bg-muted/10 dark:bg-muted/5 border dark:border-border/30 rounded-2xl"
                 rows={1}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {

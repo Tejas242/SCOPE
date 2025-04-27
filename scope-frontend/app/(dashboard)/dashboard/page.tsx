@@ -78,14 +78,14 @@ export default function Dashboard() {
       <div className="p-4 md:p-6 space-y-6">
         {/* Header section with glow effect */}
         <div className="relative">
-          <div className="absolute -top-12 -left-8 h-16 w-80 bg-primary/10 blur-2xl rounded-full -z-10"></div>
+          <div className="absolute -top-12 -left-8 h-16 w-80 bg-primary/10 dark:bg-primary/20 blur-2xl rounded-full -z-10"></div>
           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
               <p className="text-muted-foreground mt-1">Insights from student complaint data</p>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 bg-muted/20 rounded-lg border shadow-sm">
-              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="flex items-center gap-2 px-3 py-2 bg-muted/20 dark:bg-muted/10 rounded-lg border dark:border-border/30 shadow-sm dark:shadow-md">
+              <div className="h-2 w-2 bg-green-500 dark:bg-green-400 rounded-full animate-pulse"></div>
               <div className="text-sm">
                 Data updated: {new Date().toLocaleDateString()}
               </div>
@@ -101,7 +101,7 @@ export default function Dashboard() {
           <Tabs defaultValue="categories" className="mt-2">
             <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
               <h2 className="text-xl font-semibold">Detailed Analysis</h2>
-              <TabsList className="p-1">
+              <TabsList className="p-1 bg-muted/50 dark:bg-muted/30">
                 <TabsTrigger value="categories">Categories</TabsTrigger>
                 <TabsTrigger value="trends">Time Trends</TabsTrigger>
                 <TabsTrigger value="words">Word Analysis</TabsTrigger>
@@ -132,7 +132,7 @@ export default function Dashboard() {
           </Tabs>
         </div>
         
-        <div className="text-sm text-muted-foreground border-t pt-4 bg-muted/10 p-4 rounded-lg">
+        <div className="text-sm text-muted-foreground border-t dark:border-t-border/30 pt-4 bg-muted/10 dark:bg-muted/5 p-4 rounded-lg">
           <p>
             This dashboard provides AI-powered analytics on SCOPE complaint data. The visualizations 
             help identify patterns, trends, and insights to improve response and resolution strategies.
