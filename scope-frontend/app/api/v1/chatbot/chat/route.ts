@@ -16,7 +16,9 @@ export async function POST(request: NextRequest) {
         'Authorization': authHeader,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(chatData)
+      body: JSON.stringify(chatData),
+      // No caching for chat responses
+      cache: 'no-store'
     });
     
     if (!response.ok) {

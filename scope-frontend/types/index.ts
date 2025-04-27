@@ -38,6 +38,10 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  hasToolCalls?: boolean;  // Flag to indicate if the message contains tool call results
+  sessionId?: string;      // Session ID for conversation continuity
+  isLoading?: boolean;     // Flag to indicate if this is a loading placeholder
+  id?: number;             // Unique identifier for the message
 }
 
 // Dashboard stats types

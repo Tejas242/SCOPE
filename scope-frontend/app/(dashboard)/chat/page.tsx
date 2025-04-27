@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import api from '@/lib/api';
+import { marked } from 'marked';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +18,7 @@ export default function ChatPage() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const [user, setUser] = useState<User | null>(null);
 
@@ -61,18 +63,42 @@ export default function ChatPage() {
     
     setLoading(true);
     setError('');
+    
+    // Add a temporary loading message
+    const loadingMessageId = Date.now();
+    setMessages(prev => [...prev, {
+      role: 'assistant',
+      content: '...',
+      timestamp: new Date(),
+      isLoading: true,
+      id: loadingMessageId
+    }]);
 
     try {
-      const response = await api.post<{ response: string }>('/api/v1/chatbot/chat', { 
-        message: userMessage 
+      const response = await api.post<{ response: string, session_id: string, has_tool_calls: boolean }>('/api/v1/chatbot/chat', { 
+        message: userMessage,
+        session_id: sessionId 
       });
       
-      // Add assistant response to chat
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: response.data.response,
-        timestamp: new Date()
-      }]);
+      // Store session id for conversation continuity
+      if (response.data.session_id) {
+        setSessionId(response.data.session_id);
+      }
+      
+      // Remove loading message and add the real response
+      setMessages(prev => prev
+        // Filter out the loading message
+        .filter(msg => !(msg.isLoading && msg.id === loadingMessageId))
+        // Add the real response
+        .concat([{
+          role: 'assistant',
+          content: response.data.response,
+          timestamp: new Date(),
+          hasToolCalls: response.data.has_tool_calls,
+          sessionId: response.data.session_id,
+          id: Date.now()
+        }])
+      );
     } catch (error) {
       console.error('Error chatting with assistant:', error);
       const apiError = error as ApiError;
@@ -137,16 +163,57 @@ export default function ChatPage() {
                     className={`rounded-lg px-4 py-2 ${
                       msg.role === 'user'
                         ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
+                        : msg.isLoading
+                          ? 'bg-muted animate-pulse'
+                          : msg.hasToolCalls 
+                            ? 'bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 shadow-sm' 
+                            : 'bg-muted'
                     }`}
                   >
-                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                    {msg.isLoading ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                      </div>
+                    ) : msg.hasToolCalls ? (
+                      <div className="whitespace-pre-wrap prose dark:prose-invert max-w-none prose-table:border prose-th:border prose-th:p-2 prose-td:border prose-td:p-2 prose-table:border-collapse prose-table:my-2 prose-img:my-0 prose-headings:mb-2 prose-headings:mt-4">
+                        <div dangerouslySetInnerHTML={{ 
+                          __html: marked.parse(msg.content, {
+                            gfm: true,
+                            breaks: true,
+                          })
+                        }} />
+                      </div>
+                    ) : (
+                      <div className="whitespace-pre-wrap">{msg.content}</div>
+                    )}
                     <div 
-                      className={`text-xs mt-1 ${
-                        msg.role === 'user' ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                      className={`text-xs mt-1 flex items-center ${
+                        msg.role === 'user' ? 'text-primary-foreground/80 justify-end' : 'text-muted-foreground justify-between'
                       }`}
                     >
-                      {msg.timestamp.toLocaleTimeString()}
+                      <span>{msg.timestamp.toLocaleTimeString()}</span>
+                      
+                      {msg.role === 'assistant' && !msg.isLoading && (
+                        <div className="flex items-center gap-2 ml-2">
+                          {msg.hasToolCalls && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-6 px-2 text-xs hover:bg-blue-100 dark:hover:bg-blue-900"
+                              onClick={() => {
+                                // Copy message content to clipboard
+                                const textToCopy = msg.content.replace(/\n\n/g, '\n');
+                                navigator.clipboard.writeText(textToCopy);
+                                alert('Content copied to clipboard');
+                              }}
+                            >
+                              Copy
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

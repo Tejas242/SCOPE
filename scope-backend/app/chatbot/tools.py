@@ -42,11 +42,30 @@ class SearchComplaintTool(BaseTool):
             if not results:
                 return "No complaints found matching your query."
             
-            output = "Here are the complaints that match your query:\n\n"
-            for i, doc in enumerate(results):
-                output += f"Complaint #{doc.metadata['id']}: {doc.page_content[:100]}...\n"
-                output += f"Category: {doc.metadata['category']}, Urgency: {doc.metadata['urgency']}, Status: {doc.metadata['status']}\n\n"
+            # Create a formatted markdown table for better UI display
+            output = f"### Search Results for: '{query}'\n\n"
+            output += "| ID | Preview | Category | Urgency | Status |\n"
+            output += "|---|---------|----------|---------|--------|\n"
             
+            for doc in enumerate(results):
+                # Get a preview of the complaint text (first 60 chars)
+                preview = doc[1].page_content[:60].replace("\n", " ").strip() + "..."
+                
+                # Format urgency with emoji indicators
+                urgency_display = doc[1].metadata['urgency']
+                if urgency_display == "Critical":
+                    urgency_display = "🔴 Critical"
+                elif urgency_display == "High":
+                    urgency_display = "🟠 High"
+                elif urgency_display == "Medium":
+                    urgency_display = "🟡 Medium"
+                elif urgency_display == "Low":
+                    urgency_display = "🟢 Low"
+                
+                # Add the table row
+                output += f"| {doc[1].metadata['id']} | {preview} | {doc[1].metadata['category']} | {urgency_display} | {doc[1].metadata['status']} |\n"
+            
+            output += "\n\nTo view full details of a specific complaint, ask me to 'get complaint #ID'"
             return output
         except Exception as e:
             return f"Error searching complaints: {str(e)}"
@@ -67,18 +86,46 @@ class GetComplaintTool(BaseTool):
             if not complaint:
                 return f"No complaint found with ID {complaint_id}"
             
-            output = f"Complaint #{complaint.id}:\n\n"
-            output += f"Text: {complaint.complaint_text}\n\n"
-            output += f"Category: {complaint.category}\n"
-            output += f"Urgency: {complaint.urgency}\n"
-            output += f"Status: {complaint.status}\n"
-            output += f"Created at: {complaint.created_at}\n"
+            # Format urgency with emoji indicators
+            urgency_display = str(complaint.urgency) if complaint.urgency is not None else "Not set"
+            if urgency_display == "Critical":
+                urgency_display = "🔴 Critical"
+            elif urgency_display == "High":
+                urgency_display = "🟠 High"
+            elif urgency_display == "Medium":
+                urgency_display = "🟡 Medium"
+            elif urgency_display == "Low":
+                urgency_display = "🟢 Low"
+                
+            # Format the created date more nicely
+            created_date = complaint.created_at.strftime("%b %d, %Y at %H:%M")
+            
+            # Format as markdown for better display
+            output = f"### Complaint #{complaint.id}\n\n"
+            
+            # Main complaint text
+            output += f"**Complaint Text:**\n> {complaint.complaint_text}\n\n"
+            
+            # Metadata in a formatted table
+            output += "| Property | Value |\n"
+            output += "|----------|-------|\n"
+            output += f"| Category | {complaint.category or 'Not set'} |\n"
+            output += f"| Urgency | {urgency_display} |\n"
+            output += f"| Status | {complaint.status} |\n"
+            output += f"| Created | {created_date} |\n"
             
             if complaint.assigned_to is not None:
-                output += f"Assigned to: {complaint.assigned_to}\n"
+                output += f"| Assigned to | {complaint.assigned_to} |\n"
+            
+            output += "\n"
             
             if complaint.response is not None:
-                output += f"\nResponse: {complaint.response}\n"
+                output += f"**Response:**\n> {complaint.response}\n\n"
+            else:
+                output += "**No response has been provided yet.**\n\n"
+                
+            # Add quick action hints
+            output += "You can update this complaint's status with 'update complaint status' command."
             
 
             output += "\nEnd of complaint details."
@@ -103,20 +150,42 @@ class UpdateComplaintStatusTool(BaseTool):
         try:
             valid_statuses = ["Pending", "In Progress", "Resolved", "Closed"]
             if status not in valid_statuses:
-                return f"Invalid status. Please use one of: {', '.join(valid_statuses)}"
+                return f"⚠️ **Invalid status**. Please use one of: {', '.join(valid_statuses)}"
             
-            complaint_update = ComplaintUpdate(status=status)
-            complaint_service = ComplaintService()
             complaint = db.query(Complaint).filter(Complaint.id == complaint_id).first()
             
             if not complaint:
-                return f"No complaint found with ID {complaint_id}"
+                return f"❌ **Error**: No complaint found with ID {complaint_id}"
             
+            # Store the previous status for the response message
+            previous_status = complaint.status
+            
+            # Update the complaint status
             setattr(complaint, "status", status)
             db.commit()
             db.refresh(complaint)
             
-            return f"Status of complaint #{complaint_id} updated to {status}"
+            # Create formatted response with status change details and emoji indicators
+            status_emoji = "🔄"
+            if status == "Resolved":
+                status_emoji = "✅"
+            elif status == "Closed":
+                status_emoji = "🔒"
+            elif status == "In Progress":
+                status_emoji = "⏳"
+                
+            output = f"### {status_emoji} Status Updated\n\n"
+            output += f"**Complaint #{complaint_id}** status has been changed:\n\n"
+            
+            output += "| | |\n"
+            output += "|---|---|\n"
+            output += f"| Previous status | {previous_status} |\n"
+            output += f"| New status | **{status}** |\n"
+            output += f"| Updated at | {complaint.updated_at.strftime('%b %d, %Y at %H:%M')} |\n\n"
+            
+            output += "Would you like to view the full details of this complaint now?"
+            
+            return output
         except Exception as e:
             db.rollback()
             return f"Error updating complaint status: {str(e)}"
@@ -137,30 +206,74 @@ class GetComplaintStatsByTypeTool(BaseTool):
         try:
             valid_categories = [c.value for c in Category]
             if category not in valid_categories:
-                return f"Invalid category. Please use one of: {', '.join(valid_categories)}"
+                return f"⚠️ **Invalid category**. Please use one of: {', '.join(valid_categories)}"
             
             complaints = db.query(Complaint).filter(Complaint.category == category).all()
             
             if not complaints:
-                return f"No complaints found in category {category}"
+                return f"📊 No complaints found in category **{category}**"
             
             status_counts = {}
             urgency_counts = {}
+            assigned_count = 0
+            has_response_count = 0
             
             for complaint in complaints:
                 status_counts[complaint.status] = status_counts.get(complaint.status, 0) + 1
                 urgency_counts[complaint.urgency] = urgency_counts.get(complaint.urgency, 0) + 1
+                
+                # Count assigned and responded complaints
+                if complaint.assigned_to is not None:
+                    assigned_count += 1
+                if complaint.response is not None:
+                    has_response_count += 1
             
-            output = f"Statistics for {category} complaints:\n\n"
-            output += f"Total complaints: {len(complaints)}\n\n"
+            # Calculate percentages for key metrics
+            total_complaints = len(complaints)
+            assigned_percentage = round((assigned_count / total_complaints) * 100, 1) if total_complaints > 0 else 0
+            response_percentage = round((has_response_count / total_complaints) * 100, 1) if total_complaints > 0 else 0
             
-            output += "Status breakdown:\n"
+            # Format output with Markdown for better UI display
+            output = f"### 📊 Statistics for {category} Complaints\n\n"
+            
+            # Summary metrics in a table
+            output += "| Metric | Value |\n"
+            output += "|--------|-------|\n"
+            output += f"| Total complaints | **{total_complaints}** |\n"
+            output += f"| Assigned | {assigned_count} ({assigned_percentage}%) |\n"
+            output += f"| With responses | {has_response_count} ({response_percentage}%) |\n\n"
+            
+            # Status breakdown in a table
+            output += "#### Status Distribution\n\n"
+            output += "| Status | Count | Percentage |\n"
+            output += "|--------|-------|------------|\n"
+            
             for status, count in status_counts.items():
-                output += f"- {status}: {count}\n"
+                percentage = round((count / total_complaints) * 100, 1)
+                output += f"| {status} | {count} | {percentage}% |\n"
             
-            output += "\nUrgency breakdown:\n"
+            # Urgency breakdown in a table
+            output += "\n#### Urgency Distribution\n\n"
+            output += "| Urgency | Count | Percentage |\n"
+            output += "|---------|-------|------------|\n"
+            
             for urgency, count in urgency_counts.items():
-                output += f"- {urgency}: {count}\n"
+                percentage = round((count / total_complaints) * 100, 1)
+                urgency_display = urgency if urgency else "Not set"
+                
+                # Add emoji indicators based on urgency
+                if urgency == "Critical":
+                    urgency_display = "🔴 Critical"
+                elif urgency == "High":
+                    urgency_display = "🟠 High"
+                elif urgency == "Medium":
+                    urgency_display = "🟡 Medium"
+                elif urgency == "Low":
+                    urgency_display = "🟢 Low"
+                
+                output += f"| {urgency_display} | {count} | {percentage}% |\n"
+            
+            output += "\nWould you like to search for specific complaints in this category?"
             
             return output
         except Exception as e:

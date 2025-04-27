@@ -26,4 +26,5 @@ dependencies = [
     "pandas>=2.1.1",
     "numpy>=1.26.0",
     "python-dotenv>=1.0.0",
+    "langgraph>=0.3.34",
 ]
