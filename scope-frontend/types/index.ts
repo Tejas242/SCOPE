@@ -43,23 +43,91 @@ export interface ChatMessage {
 // Dashboard stats types
 export interface BasicStats {
   total_complaints: number;
-  open_complaints: number;
-  critical_urgency: number;
-  avg_response_time?: number;
+  by_category: Record<string, number>;
+  by_urgency: Record<string, number>;
+  by_status: Record<string, number>;
+  response_rate: number;
+  assigned_rate: number;
 }
 
-export interface TimeTrend {
+export interface DailyTrend {
+  dates: string[];
+  counts: number[];
+}
+
+export interface MonthlyTrendItem {
   month: string;
-  count: number;
+  [category: string]: string | number;
+}
+
+export interface TimeTrends {
+  daily_counts: DailyTrend;
+  monthly_by_category: MonthlyTrendItem[];
+  categories: string[];
+}
+
+export interface CategoryTable {
+  categories: string[];
+  urgency_levels?: string[];
+  statuses?: string[];
+  data: number[][];
 }
 
 export interface CategoryRelationships {
-  category_counts: Record<ComplaintCategory, number>;
+  category_urgency: CategoryTable;
+  category_status: CategoryTable;
 }
 
 export interface WordFrequency {
   word: string;
   count: number;
+}
+
+// New types for clustering and topic analysis
+export interface ClusterData {
+  complaint_ids: number[];
+  categories: string[];
+  urgencies: string[];
+  cluster_labels: number[];
+  coordinates: {
+    x: number[];
+    y: number[];
+  };
+  cluster_insights: {
+    [key: string]: {
+      size: number;
+      top_category: string;
+      samples: string[];
+    };
+  };
+}
+
+export interface TopicDocument {
+  id: number;
+  text: string;
+  score: number;
+}
+
+export interface Topic {
+  id: number;
+  top_words: string[];
+  documents: TopicDocument[];
+  weight: number;
+}
+
+export interface DocumentTopic {
+  id: number;
+  text: string;
+  topics: {
+    id: number;
+    score: number;
+  }[];
+}
+
+export interface TopicsData {
+  topics: Topic[];
+  document_topics: DocumentTopic[];
+  topic_term_matrix: number[][];
 }
 
 // Error handling
