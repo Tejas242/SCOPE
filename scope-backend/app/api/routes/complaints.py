@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -10,7 +10,8 @@ from app.models.schemas.complaint import (
     ComplaintCreate,
     ComplaintResponse,
     ComplaintUpdate,
-    ComplaintPrediction
+    ComplaintPrediction,
+    PaginatedComplaintsResponse
 )
 from app.ml.model import get_model_predictor
 
@@ -25,16 +26,40 @@ async def create_complaint(
 ) -> Any:
     return await ComplaintService.create_complaint(db=db, complaint=complaint)
 
-
-@router.get("/", response_model=List[ComplaintResponse])
+@router.get("/", response_model=PaginatedComplaintsResponse)
 async def read_complaints(
     skip: int = 0,
     limit: int = 100,
+    category: Optional[str] = None,
+    urgency: Optional[str] = None,
+    status: Optional[str] = None,
+    search: Optional[str] = None,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_staff_user)
 ) -> Any:
-    complaints = await ComplaintService.get_complaints(db, skip=skip, limit=limit)
-    return complaints
+    complaints = await ComplaintService.get_complaints(
+        db, 
+        skip=skip, 
+        limit=limit,
+        category=category,
+        urgency=urgency,
+        status=status,
+        search=search
+    )
+    
+    # Get total count with same filters
+    total_count = await ComplaintService.get_complaints_count(
+        db,
+        category=category,
+        urgency=urgency,
+        status=status,
+        search=search
+    )
+    
+    return {
+        "items": complaints,
+        "total": total_count
+    }
 
 
 @router.get("/{complaint_id}", response_model=ComplaintResponse)

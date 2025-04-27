@@ -44,3 +44,7 @@ class ComplaintPrediction(BaseModel):
     urgency: Urgency
     confidence_category: float
     confidence_urgency: float
+
+class PaginatedComplaintsResponse(BaseModel):
+    items: List[ComplaintResponse]
+    total: int

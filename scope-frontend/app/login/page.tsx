@@ -26,9 +26,10 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem('token');
-    if (token) {
+    // Check if user is already logged in from localStorage
+    // We're using cookies now for the token, but we still use localStorage for user data
+    const user = localStorage.getItem('user');
+    if (user) {
       router.push('/dashboard');
     }
   }, [router]);
@@ -40,24 +41,16 @@ export default function LoginPage() {
 
     try {
       // Create FormData object - OAuth2PasswordRequestForm expects form data, not JSON
-      const formData = new URLSearchParams();
+      const formData = new FormData();
       formData.append('username', email);
       formData.append('password', password);
       
-      const response = await axios.post<LoginResponse>(
-        'http://localhost:8000/api/v1/auth/login',
-        formData.toString(),
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        }
+      // Actually make the API request to login
+      await axios.post<LoginResponse>(
+        '/api/v1/auth/login',
+        formData
       );
-
-      // Save token to localStorage
-      localStorage.setItem('token', response.data.access_token);
       
-      // Since we don't have a /me endpoint in the backend, we'll create a simplified user object
       // We can identify the user type based on the email in this demo app
       let role: UserRole = 'student';
       if (email.includes('admin')) {
@@ -78,17 +71,16 @@ export default function LoginPage() {
       // Save user info to localStorage
       localStorage.setItem('user', JSON.stringify(user));
       
-      // Set token in cookie for middleware
-      document.cookie = `token=${response.data.access_token}; path=/`;
-      
       // Show redirecting state
       setIsRedirecting(true);
       
       // Show success message
       showToast('success', 'Login Successful', 'Redirecting to dashboard...');
       
-      // Redirect to dashboard after a short delay to allow state update
-      router.push('/dashboard');
+      // Redirect to dashboard after a short delay to allow state update and cookie to be set
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000);
     } catch (error) {
       console.error('Login error:', error);
       const axiosError = error as AxiosError<{ detail: string }>;
@@ -108,7 +100,8 @@ export default function LoginPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg flex flex-col items-center space-y-4">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="text-lg font-medium">Redirecting to dashboard...</p>
+            <p className="text-lg font-medium">Login successful!</p>
+            <p className="text-sm text-muted-foreground">Redirecting to dashboard...</p>
           </div>
         </div>
       )}

@@ -7,10 +7,16 @@ export default function middleware(request: NextRequest) {
   // Define public paths that don't require authentication
   const isPublicPath = path === '/login';
   
-  // Get token from cookies or local storage
-  // Note: middleware can only access cookies, not localStorage
-  // We'll need to manage token synchronization between cookies and localStorage
+  // Define API routes that should be excluded from middleware checks
+  const isApiRoute = path.startsWith('/api/');
+  
+  // Get token from cookies
   const token = request.cookies.get('token')?.value || '';
+  
+  // Skip middleware check for API routes (they handle auth separately)
+  if (isApiRoute) {
+    return;
+  }
   
   // If already logged in and trying to access login page, redirect to dashboard
   if (isPublicPath && token) {
@@ -23,7 +29,7 @@ export default function middleware(request: NextRequest) {
   }
 }
 
-// See "Matching Paths" below to learn more
+// Exclude Next.js assets from middleware processing
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 }

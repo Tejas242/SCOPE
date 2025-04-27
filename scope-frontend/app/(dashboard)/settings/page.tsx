@@ -12,6 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { showToast } from '@/lib/toast';
 import { User, ApiError } from '@/types';
+import { CacheRevalidation } from '@/components/dashboard/CacheRevalidation';
 
 interface ProfileForm {
   email: string;
@@ -129,6 +130,7 @@ export default function SettingsPage() {
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="password">Password</TabsTrigger>
+          {user?.role === 'admin' && <TabsTrigger value="system">System</TabsTrigger>}
         </TabsList>
         
         <TabsContent value="profile">
@@ -245,6 +247,21 @@ export default function SettingsPage() {
             </CardFooter>
           </Card>
         </TabsContent>
+        
+        {user?.role === 'admin' && (
+          <TabsContent value="system">
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium">System Management</h3>
+                <p className="text-sm text-muted-foreground">
+                  Manage system-level settings and cache for optimal performance.
+                </p>
+              </div>
+              <Separator />
+              <CacheRevalidation />
+            </div>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

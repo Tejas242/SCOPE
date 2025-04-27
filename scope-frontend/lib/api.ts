@@ -1,22 +1,19 @@
 import axios, { AxiosError } from 'axios';
 import { ApiError } from '@/types';
 
-const API_URL = 'http://localhost:8000';
-
+// Use relative URLs to access Next.js API routes
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: '/',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 // Add a request interceptor to include the token in all requests
+// No need to manually set Authorization header when using API routes as they
+// automatically include the token from cookies on server-side
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
     return config;
   },
   (error) => {
@@ -29,12 +26,17 @@ api.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     if (error.response && error.response.status === 401) {
-      // Clear auth data
-      localStorage.removeItem('token');
+      // Clear local storage user data
       localStorage.removeItem('user');
-      document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      
+      // Call our logout API endpoint to clear the server-side token cookie
+      try {
+        await axios.post('/api/v1/auth/logout');
+      } catch (logoutError) {
+        console.error('Error during logout:', logoutError);
+      }
       
       // Redirect to login page if not already there
       if (window.location.pathname !== '/login') {

@@ -39,8 +39,55 @@ class ComplaintService:
         return db.query(Complaint).filter(Complaint.id == complaint_id).first()
     
     @staticmethod
-    async def get_complaints(db: Session, skip: int = 0, limit: int = 100) -> List[Complaint]:
-        return db.query(Complaint).offset(skip).limit(limit).all()
+    async def get_complaints(
+        db: Session, 
+        skip: int = 0, 
+        limit: int = 100,
+        category: Optional[str] = None,
+        urgency: Optional[str] = None,
+        status: Optional[str] = None,
+        search: Optional[str] = None
+    ) -> List[Complaint]:
+        query = db.query(Complaint)
+        
+        # Apply filters if provided
+        if category:
+            query = query.filter(Complaint.category == category)
+        if urgency:
+            query = query.filter(Complaint.urgency == urgency)
+        if status:
+            query = query.filter(Complaint.status == status)
+        if search:
+            query = query.filter(Complaint.complaint_text.ilike(f"%{search}%"))
+        
+        # Sort by created_at in descending order (newest first)
+        query = query.order_by(Complaint.created_at.desc())
+            
+        # Apply pagination
+        return query.offset(skip).limit(limit).all()
+        
+    @staticmethod
+    async def get_complaints_count(
+        db: Session,
+        category: Optional[str] = None,
+        urgency: Optional[str] = None,
+        status: Optional[str] = None,
+        search: Optional[str] = None
+    ) -> int:
+        """Get the total count of complaints with the applied filters."""
+        query = db.query(Complaint)
+        
+        # Apply filters if provided
+        if category:
+            query = query.filter(Complaint.category == category)
+        if urgency:
+            query = query.filter(Complaint.urgency == urgency)
+        if status:
+            query = query.filter(Complaint.status == status)
+        if search:
+            query = query.filter(Complaint.complaint_text.ilike(f"%{search}%"))
+            
+        return query.count()
     
     @staticmethod
     async def update_complaint(db: Session, complaint_id: int, complaint_update: ComplaintUpdate) -> Optional[Complaint]:

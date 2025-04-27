@@ -73,6 +73,11 @@ export default function ComplaintsPage() {
   const [urgencyFilter, setUrgencyFilter] = useState<ComplaintUrgency | null>(null);
   const [statusFilter, setStatusFilter] = useState<ComplaintStatus | null>(null);
   
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalComplaints, setTotalComplaints] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
   const [isNewComplaintOpen, setIsNewComplaintOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -94,40 +99,45 @@ export default function ComplaintsPage() {
 
   useEffect(() => {
     fetchComplaints();
-  }, [categoryFilter, urgencyFilter, statusFilter]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryFilter, urgencyFilter, statusFilter, currentPage, pageSize]);
 
   const fetchComplaints = async () => {
     try {
       setLoading(true);
-
-      const response = await api.get<Complaint[]>('/api/v1/complaints/');
-      let filteredComplaints = response.data;
-
+      
+      // Build query parameters for API request
+      const params = new URLSearchParams();
+      
+      // Add pagination parameters
+      params.append('skip', ((currentPage - 1) * pageSize).toString());
+      params.append('limit', pageSize.toString());
+      
+      // Add filter parameters
       if (categoryFilter) {
-        filteredComplaints = filteredComplaints.filter((complaint) => 
-          complaint.category === categoryFilter
-        );
+        params.append('category', categoryFilter);
       }
-
+      
       if (urgencyFilter) {
-        filteredComplaints = filteredComplaints.filter((complaint) => 
-          complaint.urgency === urgencyFilter
-        );
+        params.append('urgency', urgencyFilter);
       }
-
+      
       if (statusFilter) {
-        filteredComplaints = filteredComplaints.filter((complaint) => 
-          complaint.status === statusFilter
-        );
+        params.append('status', statusFilter);
       }
-
-      if (searchTerm) {
-        filteredComplaints = filteredComplaints.filter((complaint) =>
-          complaint.complaint_text.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+      
+      if (searchTerm.trim()) {
+        params.append('search', searchTerm.trim());
       }
-
-      setComplaints(filteredComplaints);
+      
+      // Fetch complaints with server-side filtering and pagination
+      const response = await api.get<{items: Complaint[], total: number}>(
+        `/api/v1/complaints/?${params.toString()}`
+      );
+      
+      // Update total count and complaints
+      setTotalComplaints(response.data.total);
+      setComplaints(response.data.items);
     } catch (error) {
       console.error('Error fetching complaints:', error);
       const apiError = error as ApiError;
@@ -139,6 +149,7 @@ export default function ComplaintsPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setCurrentPage(1); // Reset to first page when searching
     fetchComplaints();
   };
 
@@ -147,6 +158,7 @@ export default function ComplaintsPage() {
     setUrgencyFilter(null);
     setStatusFilter(null);
     setSearchTerm('');
+    setCurrentPage(1);
     fetchComplaints();
   };
 
@@ -305,8 +317,8 @@ export default function ComplaintsPage() {
         
         <div className="flex gap-2 flex-wrap">
           <Select 
-            value={categoryFilter || ''} 
-            onValueChange={(value) => setCategoryFilter(value as ComplaintCategory || null)}
+            value={categoryFilter || 'all'} 
+            onValueChange={(value) => setCategoryFilter(value === 'all' ? null : value as ComplaintCategory)}
           >
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Category" />
@@ -320,8 +332,8 @@ export default function ComplaintsPage() {
           </Select>
           
           <Select 
-            value={urgencyFilter || ''} 
-            onValueChange={(value) => setUrgencyFilter(value as ComplaintUrgency || null)}
+            value={urgencyFilter || 'All'} 
+            onValueChange={(value) => setUrgencyFilter(value === 'All' ? null : value as ComplaintUrgency)}
           >
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Urgency" />
@@ -335,8 +347,8 @@ export default function ComplaintsPage() {
           </Select>
           
           <Select 
-            value={statusFilter || ''} 
-            onValueChange={(value) => setStatusFilter(value as ComplaintStatus || null)}
+            value={statusFilter || 'All'} 
+            onValueChange={(value) => setStatusFilter(value === 'All' ? null : value as ComplaintStatus)}
           >
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Status" />
@@ -359,7 +371,7 @@ export default function ComplaintsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px]">ID</TableHead>
+              <TableHead className="w-[50px]">No.</TableHead>
               <TableHead>Complaint</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Urgency</TableHead>
@@ -385,9 +397,9 @@ export default function ComplaintsPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              complaints.map((complaint) => (
+              complaints.map((complaint, index) => (
                 <TableRow key={complaint.id}>
-                  <TableCell className="font-medium">{complaint.id}</TableCell>
+                  <TableCell className="font-medium">{(currentPage - 1) * pageSize + index + 1}</TableCell>
                   <TableCell className="max-w-md truncate">
                     {complaint.complaint_text.length > 100
                       ? `${complaint.complaint_text.substring(0, 100)}...`
@@ -431,6 +443,60 @@ export default function ComplaintsPage() {
             )}
           </TableBody>
         </Table>
+        
+        {/* Pagination Controls */}
+        <div className="p-4 flex items-center justify-between border-t">
+          <div className="text-sm text-muted-foreground">
+            Showing {complaints.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}-
+            {Math.min(currentPage * pageSize, totalComplaints)} of {totalComplaints} complaints
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(value) => {
+                setPageSize(Number(value));
+                setCurrentPage(1);
+              }}
+            >
+              <SelectTrigger className="w-[100px]">
+                <SelectValue placeholder="Page size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5 per page</SelectItem>
+                <SelectItem value="10">10 per page</SelectItem>
+                <SelectItem value="25">25 per page</SelectItem>
+                <SelectItem value="50">50 per page</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            
+            <div className="flex items-center text-sm">
+              Page {currentPage} of {Math.ceil(totalComplaints / pageSize)}
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => 
+                setCurrentPage((prev) => 
+                  Math.min(prev + 1, Math.ceil(totalComplaints / pageSize))
+                )
+              }
+              disabled={currentPage >= Math.ceil(totalComplaints / pageSize)}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* New Complaint Dialog */}
