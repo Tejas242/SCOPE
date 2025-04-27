@@ -54,9 +54,9 @@ export default function HomePage() {
       <section className="relative min-h-screen w-full flex items-center justify-center pt-24 pb-16 overflow-hidden">
         {/* Modern geometric background */}
         <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]"></div>
-          <div className="absolute top-0 right-0 w-1/2 h-96 bg-primary/5 rounded-bl-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-1/2 h-96 bg-primary/5 rounded-tr-full blur-3xl"></div>
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)] dark:[mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#fff_30%,transparent_100%)]"></div>
+          <div className="absolute top-0 right-0 w-1/2 h-96 bg-primary/5 dark:bg-primary/10 rounded-bl-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-1/2 h-96 bg-primary/5 dark:bg-primary/10 rounded-tr-full blur-3xl"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10">
@@ -68,7 +68,7 @@ export default function HomePage() {
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight">
               Student Complaints,
-              <span className="block mt-2 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              <span className="block mt-2 bg-gradient-to-r from-primary to-blue-600 dark:from-primary dark:to-blue-400 bg-clip-text text-transparent line-clamp-1.5">
                 Intelligently Managed
               </span>
             </h1>
@@ -119,10 +119,10 @@ export default function HomePage() {
       
       {/* Features Section */}
       <section id="features" className="py-24 relative">
-        <div className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+        <div className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent dark:via-border/50"></div>
         <div className="container mx-auto px-4 relative">
           <div className="max-w-3xl mx-auto text-center mb-16 reveal">
-            <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+            <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 dark:bg-primary/20 text-primary text-sm font-medium mb-4">
               <span>Key Features</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold">Everything you need to manage student complaints</h2>
@@ -135,8 +135,8 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 reveal">
             {features.map((feature, i) => (
               <div key={i} className="group">
-                <div className="bg-card hover:bg-card/95 border border-border/50 hover:border-primary/30 rounded-xl p-6 h-full transition-all duration-300 hover:shadow-md hover:shadow-primary/5">
-                  <div className="mb-4 p-2.5 rounded-lg bg-primary/10 inline-flex text-primary">
+                <div className="bg-card dark:bg-card/80 hover:bg-card/95 dark:hover:bg-card border border-border/50 dark:border-border/30 hover:border-primary/30 dark:hover:border-primary/40 rounded-xl p-6 h-full transition-all duration-300 hover:shadow-md hover:shadow-primary/5 dark:hover:shadow-primary/10">
+                  <div className="mb-4 p-2.5 rounded-lg bg-primary/10 dark:bg-primary/20 inline-flex text-primary">
                     {feature.icon}
                   </div>
                   <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
@@ -231,8 +231,8 @@ export default function HomePage() {
       </section>
       
       {/* Statistics Section */}
-      <section className="py-24 bg-muted/5 relative">
-        <div className="absolute inset-y-0 left-0 w-1/3 bg-primary/5 transform -skew-x-12"></div>
+      <section className="py-24 bg-muted/5 dark:bg-muted/10 relative">
+        <div className="absolute inset-y-0 left-0 w-1/3 bg-primary/5 dark:bg-primary/10 transform -skew-x-12"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 reveal">
             <div className="text-center p-6">
@@ -270,11 +270,11 @@ export default function HomePage() {
           
           <div className="grid md:grid-cols-3 gap-8 reveal">
             {testimonials.map((testimonial, i) => (
-              <div key={i} className="bg-card border rounded-xl p-8 shadow-sm relative hover:shadow-md hover:shadow-primary/5 hover:border-primary/30 transition-all duration-300">
-                <div className="text-6xl text-primary/10 font-serif absolute top-4 left-4">&quot;</div>
+              <div key={i} className="bg-card dark:bg-card/80 border dark:border-border/30 rounded-xl p-8 shadow-sm relative hover:shadow-md hover:shadow-primary/5 dark:hover:shadow-primary/10 hover:border-primary/30 dark:hover:border-primary/40 transition-all duration-300">
+                <div className="text-6xl text-primary/10 dark:text-primary/20 font-serif absolute top-4 left-4">&quot;</div>
                 <p className="text-lg mb-6 relative z-10">{testimonial.quote}</p>
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary font-bold">
                     {testimonial.author.charAt(0)}
                   </div>
                   <div>
@@ -289,9 +289,9 @@ export default function HomePage() {
       </section>
       
       {/* CTA Section */}
-      <section className="py-24 relative overflow-hidden bg-primary/5">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+      <section className="py-24 relative overflow-hidden bg-primary/5 dark:bg-primary/10">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 dark:via-primary/40 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 dark:via-primary/40 to-transparent"></div>
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-8 reveal">

@@ -12,11 +12,16 @@ import {
   Settings, 
   Menu,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  Sun,
+  Moon,
+  Laptop
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { useTheme } from 'next-themes';
+import { cn } from '@/lib/utils';
 import LogoutButton from './logout-button';
 
 interface NavItemProps {
@@ -188,9 +193,11 @@ export function Sidebar() {
         ))}
       </nav>
       
-      {/* Footer with logout and toggle buttons */}
+      {/* Footer with theme toggle, sidebar toggle and logout buttons */}
       <div className={`${collapsed ? 'px-2 py-4' : 'p-4'} mt-auto`}>
-        <div className={`flex ${collapsed ? 'flex-col' : 'flex-row justify-between'} items-center gap-2`}>
+        <ThemeToggle collapsed={collapsed} />
+        
+        <div className={`flex ${collapsed ? 'flex-col' : 'flex-row justify-between'} items-center gap-2 mt-2`}>
           {/* When collapsed, toggle button goes above logout button */}
           {collapsed && <ToggleButton />}
           
@@ -227,3 +234,58 @@ export function Sidebar() {
     </>
   );
 }
+
+// Theme toggle component
+interface ThemeToggleProps {
+  collapsed: boolean;
+}
+
+const ThemeToggle = ({ collapsed }: ThemeToggleProps) => {
+  const { theme, setTheme } = useTheme();
+
+  return (
+    <div className={collapsed ? 'flex justify-center' : ''}>
+      <div className={cn(
+        "flex border rounded-lg",
+        collapsed ? "flex-col gap-1 p-1 mx-auto" : "gap-0.5 p-0.5"
+      )}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "h-8 w-8 rounded",
+            theme === 'light' ? "bg-primary/10 text-primary" : "text-muted-foreground"
+          )}
+          onClick={() => setTheme('light')}
+          title="Light mode"
+        >
+          <Sun className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "h-8 w-8 rounded",
+            theme === 'dark' ? "bg-primary/10 text-primary" : "text-muted-foreground"
+          )}
+          onClick={() => setTheme('dark')}
+          title="Dark mode"
+        >
+          <Moon className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "h-8 w-8 rounded",
+            theme === 'system' ? "bg-primary/10 text-primary" : "text-muted-foreground"
+          )}
+          onClick={() => setTheme('system')}
+          title="System preference"
+        >
+          <Laptop className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
