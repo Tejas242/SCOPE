@@ -10,8 +10,9 @@ import {
   FileText, 
   Users, 
   Settings, 
-  LogOut, 
-  Menu 
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,10 +30,14 @@ const NavItem = ({ href, icon, label, active }: NavItemProps) => {
   return (
     <Link href={href} className="w-full">
       <Button
-        variant={active ? "secondary" : "ghost"}
-        className={`w-full justify-start ${active ? 'bg-muted' : ''}`}
+        variant="ghost"
+        className={`w-full justify-start hover:bg-primary/10 transition-all ${
+          active 
+            ? 'bg-primary/10 text-primary font-medium border-l-2 border-primary rounded-l-none' 
+            : ''
+        }`}
       >
-        <span className="mr-2">{icon}</span>
+        <span className="mr-3">{icon}</span>
         {label}
       </Button>
     </Link>
@@ -43,6 +48,7 @@ import { User } from '@/types';
 
 export function Sidebar() {
   const [user, setUser] = useState<User | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   
   useEffect(() => {
@@ -50,6 +56,12 @@ export function Sidebar() {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser) as User);
+    }
+    
+    // Load sidebar state from localStorage
+    const savedCollapsed = localStorage.getItem('sidebarCollapsed');
+    if (savedCollapsed) {
+      setCollapsed(JSON.parse(savedCollapsed));
     }
   }, []);
 
@@ -81,42 +93,115 @@ export function Sidebar() {
     },
   ];
 
+  // Toggle sidebar collapse
+  const toggleCollapse = () => {
+    const newState = !collapsed;
+    setCollapsed(newState);
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(newState));
+  };
+
+  // Toggle button component
+  const ToggleButton = () => (
+    <Button
+      variant={collapsed ? "outline" : "secondary"}
+      size="icon"
+      className={`h-8 w-8 rounded-md ${collapsed ? 'border-muted bg-background' : 'border border-primary/20'} hover:bg-muted/80`}
+      onClick={toggleCollapse}
+      title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+    >
+      {collapsed ? (
+        <PanelLeftOpen size={16} className="text-primary" />
+      ) : (
+        <PanelLeftClose size={16} className="text-primary" />
+      )}
+    </Button>
+  );
+
   const sidebarContent = (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center p-4">
-        <h2 className="text-2xl font-bold">SCOPE</h2>
+    <div className="flex flex-col h-full bg-background">
+      {/* App Logo */}
+      <div className={`flex items-center ${collapsed ? 'justify-center py-6' : 'p-6'}`}>
+        <div className={`flex items-center ${collapsed ? '' : 'gap-2'}`}>
+          <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold">S</div>
+          {!collapsed && <h2 className="text-xl font-bold tracking-tight">SCOPE</h2>}
+        </div>
       </div>
       <Separator />
       
+      {/* User Profile */}
       {user && (
-        <div className="px-4 py-2 mb-2 mt-2">
-          <div className="flex items-center space-x-2">
-            <Avatar>
+        <div className={`${collapsed ? 'px-2' : 'px-4'} py-3 mb-2 mt-2`}>
+          <div className={`flex items-center ${collapsed ? 'justify-center' : 'space-x-3'} bg-muted/40 p-3 rounded-lg`}>
+            <Avatar className="h-10 w-10 border-2 border-primary/20">
               <AvatarImage src="" />
-              <AvatarFallback>{user.full_name ? user.full_name.charAt(0) : user.email.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                {user.full_name ? user.full_name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
-            <div className="space-y-1">
-              <p className="text-sm font-medium">{user.full_name || user.email}</p>
-              <p className="text-xs text-muted-foreground capitalize">{user.role || 'User'}</p>
-            </div>
+            {!collapsed && (
+              <div className="space-y-1">
+                <p className="text-sm font-medium">{user.full_name || user.email.split('@')[0]}</p>
+                <div className="flex items-center">
+                  <div className="h-2 w-2 rounded-full bg-green-500 mr-1.5"></div>
+                  <p className="text-xs text-muted-foreground capitalize">{user.role || 'User'}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
       
-      <nav className="flex-1 px-2 py-2 space-y-1">
+      {/* Navigation */}
+      {!collapsed && (
+        <div className="px-3 py-2">
+          <p className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+            Main Menu
+          </p>
+        </div>
+      )}
+      
+      <nav className={`flex-1 ${collapsed ? 'px-1' : 'px-2'} py-1 space-y-0.5`}>
         {navItems.map((item) => (
-          <NavItem
-            key={item.href}
-            href={item.href}
-            icon={item.icon}
-            label={item.label}
-            active={pathname === item.href}
-          />
+          collapsed ? (
+            <Link key={item.href} href={item.href} className="w-full block">
+              <Button
+                variant="ghost"
+                className={`w-full justify-center py-3 hover:bg-primary/10 transition-all ${
+                  pathname === item.href 
+                    ? 'bg-primary/10 text-primary font-medium' 
+                    : ''
+                }`}
+                title={item.label}
+              >
+                {item.icon}
+              </Button>
+            </Link>
+          ) : (
+            <NavItem
+              key={item.href}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              active={pathname === item.href}
+            />
+          )
         ))}
       </nav>
       
-      <div className="p-4">
-        <LogoutButton />
+      {/* Footer with logout and toggle buttons */}
+      <div className={`${collapsed ? 'px-2 py-4' : 'p-4'} mt-auto`}>
+        <div className={`flex ${collapsed ? 'flex-col' : 'flex-row justify-between'} items-center gap-2`}>
+          {/* When collapsed, toggle button goes above logout button */}
+          {collapsed && <ToggleButton />}
+          
+          {/* Logout button takes full width in expanded mode */}
+          <div className={!collapsed ? 'flex-1' : ''}>
+            <LogoutButton textLabel={!collapsed} />
+          </div>
+          
+          {/* When expanded, toggle button goes next to logout button */}
+          {!collapsed && <ToggleButton />}
+        </div>
       </div>
     </div>
   );
@@ -135,8 +220,8 @@ export function Sidebar() {
         </SheetContent>
       </Sheet>
 
-      {/* Desktop navigation */}
-      <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-background border-r">
+      {/* Desktop navigation - will-change property helps with transition performance */}
+      <div className={`hidden md:flex ${collapsed ? 'md:w-16' : 'md:w-64'} md:flex-col md:fixed md:inset-y-0 bg-background border-r transition-all duration-200 ease-in-out will-change-transform will-change-width overflow-hidden`}>
         {sidebarContent}
       </div>
     </>

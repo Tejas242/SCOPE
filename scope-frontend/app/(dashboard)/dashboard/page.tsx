@@ -28,7 +28,6 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
         // Fetch all data in parallel with proper typing
         const [
           basicStatsRes, 
@@ -75,53 +74,70 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-        <div className="text-sm text-muted-foreground">
-          Data updated: {new Date().toLocaleDateString()}
+    <div className="-mt-3 -mx-4 md:-mx-8 h-[calc(100vh-3rem)]">
+      <div className="p-4 md:p-6 space-y-6">
+        {/* Header section with glow effect */}
+        <div className="relative">
+          <div className="absolute -top-12 -left-8 h-16 w-80 bg-primary/10 blur-2xl rounded-full -z-10"></div>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
+              <p className="text-muted-foreground mt-1">Insights from student complaint data</p>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 bg-muted/20 rounded-lg border shadow-sm">
+              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+              <div className="text-sm">
+                Data updated: {new Date().toLocaleDateString()}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Basic Stats Cards Section */}
-      <BasicStatsDisplay stats={basicStats} loading={loading} />
+        {/* Basic Stats Cards Section */}
+        <BasicStatsDisplay stats={basicStats} loading={loading} />
 
-      {/* Main Dashboard Tabs */}
-      <Tabs defaultValue="categories" className="mt-8">
-        <TabsList className="mb-4">
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-          <TabsTrigger value="trends">Time Trends</TabsTrigger>
-          <TabsTrigger value="words">Word Analysis</TabsTrigger>
-          <TabsTrigger value="clusters">Complaint Clusters</TabsTrigger>
-          <TabsTrigger value="topics">Topic Analysis</TabsTrigger>
-        </TabsList>
+        {/* Main Dashboard Tabs - Full-width without surrounding card */}
+        <div>
+          <Tabs defaultValue="categories" className="mt-2">
+            <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
+              <h2 className="text-xl font-semibold">Detailed Analysis</h2>
+              <TabsList className="p-1">
+                <TabsTrigger value="categories">Categories</TabsTrigger>
+                <TabsTrigger value="trends">Time Trends</TabsTrigger>
+                <TabsTrigger value="words">Word Analysis</TabsTrigger>
+                <TabsTrigger value="clusters">Clusters</TabsTrigger>
+                <TabsTrigger value="topics">Topics</TabsTrigger>
+              </TabsList>
+            </div>
+            
+            <TabsContent value="categories">
+              <CategoryChart data={categoryRelationships} loading={loading} />
+            </TabsContent>
+          
+            <TabsContent value="trends">
+              <TimeSeriesChart data={timeTrends} loading={loading} />
+            </TabsContent>
+          
+            <TabsContent value="words">
+              <WordFrequencyChart data={wordFrequency} loading={loading} />
+            </TabsContent>
+          
+            <TabsContent value="clusters">
+              <ClusterVisualization data={clusterData} loading={loading} />
+            </TabsContent>
+          
+            <TabsContent value="topics">
+              <TopicsExplorer data={topicsData} loading={loading} />
+            </TabsContent>
+          </Tabs>
+        </div>
         
-        <TabsContent value="categories">
-          <CategoryChart data={categoryRelationships} loading={loading} />
-        </TabsContent>
-        
-        <TabsContent value="trends">
-          <TimeSeriesChart data={timeTrends} loading={loading} />
-        </TabsContent>
-        
-        <TabsContent value="words">
-          <WordFrequencyChart data={wordFrequency} loading={loading} />
-        </TabsContent>
-        
-        <TabsContent value="clusters">
-          <ClusterVisualization data={clusterData} loading={loading} />
-        </TabsContent>
-        
-        <TabsContent value="topics">
-          <TopicsExplorer data={topicsData} loading={loading} />
-        </TabsContent>
-      </Tabs>
-      
-      <div className="mt-8 text-sm text-muted-foreground border-t pt-4">
-        <p>
-          This dashboard provides AI-powered analytics on SCOPE complaint data. The visualizations 
-          help identify patterns, trends, and insights to improve response and resolution strategies.
-        </p>
+        <div className="text-sm text-muted-foreground border-t pt-4 bg-muted/10 p-4 rounded-lg">
+          <p>
+            This dashboard provides AI-powered analytics on SCOPE complaint data. The visualizations 
+            help identify patterns, trends, and insights to improve response and resolution strategies.
+          </p>
+        </div>
       </div>
     </div>
   );

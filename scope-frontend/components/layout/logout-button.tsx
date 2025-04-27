@@ -4,7 +4,7 @@ import { LogOut } from 'lucide-react';
 import axios from 'axios';
 import { showToast } from '@/lib/toast';
 
-export default function LogoutButton() {
+export default function LogoutButton({ textLabel = true }: { textLabel?: boolean }) {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -30,13 +30,13 @@ export default function LogoutButton() {
 
   return (
     <Button
-      variant="ghost"
-      size="sm"
+      variant="outline"
       onClick={handleLogout}
-      className="w-full justify-start"
+      className={`w-full ${textLabel ? 'justify-start' : 'justify-center'} border-primary/20 hover:bg-primary/5 hover:text-primary group`}
+      title="Sign Out"
     >
-      <LogOut className="mr-2 h-4 w-4" />
-      Logout
+      <LogOut className={`${textLabel ? 'mr-2' : ''} h-4 w-4 group-hover:text-primary transition-colors`} />
+      {textLabel && "Sign Out"}
     </Button>
   );
 }

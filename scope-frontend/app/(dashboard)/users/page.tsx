@@ -247,11 +247,20 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">User Management</h1>
-        <Button onClick={() => setIsNewUserDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> New User
-        </Button>
+      <div className="relative">
+        <div className="absolute -top-12 -left-8 h-16 w-80 bg-indigo-500/10 blur-2xl rounded-full -z-10"></div>
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
+            <p className="text-muted-foreground mt-1">Manage users and their permissions</p>
+          </div>
+          <Button 
+            onClick={() => setIsNewUserDialogOpen(true)}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Add New User
+          </Button>
+        </div>
       </div>
 
       {error && (
@@ -262,22 +271,24 @@ export default function UsersPage() {
         </Alert>
       )}
 
-      <div className="flex gap-2">
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <Input
-            placeholder="Search users..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-80"
-          />
-          <Button type="submit" variant="outline" size="icon">
-            <Search className="h-4 w-4" />
+      <div className="bg-card border rounded-lg p-5 shadow-sm">
+        <form onSubmit={handleSearch} className="flex gap-2 mb-4">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search users by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 w-full"
+            />
+          </div>
+          <Button type="submit" variant="secondary">
+            Search
           </Button>
         </form>
-      </div>
 
-      <div className="border rounded-md">
-        <Table>
+        <div className="border rounded-lg shadow-sm overflow-hidden bg-background">
+          <Table>
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
@@ -292,52 +303,71 @@ export default function UsersPage() {
             {loading ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-10">
-                  <Loader2 className="animate-spin h-6 w-6 mx-auto" />
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className="relative">
+                      <div className="h-12 w-12 rounded-full border-2 border-t-indigo-500 animate-spin"></div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Users className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Loading users...</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : users.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-10">
                   <div className="flex flex-col items-center justify-center text-muted-foreground">
-                    <Users className="h-10 w-10 mb-2" />
-                    <p>No users found</p>
+                    <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mb-2">
+                      <Users className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <p className="font-medium">No users found</p>
+                    <p className="text-sm text-muted-foreground mt-1">Try adjusting your search criteria</p>
                   </div>
                 </TableCell>
               </TableRow>
             ) : (
               users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.full_name || '-'}</TableCell>
+                <TableRow key={user.id} className="hover:bg-muted/30">
+                  <TableCell className="font-medium">{user.id}</TableCell>
                   <TableCell>
-                    <Badge className={getRoleBadgeColor(user.role)}>
-                      {user.role || 'No role'}
+                    <div className="font-medium">{user.email}</div>
+                  </TableCell>
+                  <TableCell>
+                    {user.full_name || <span className="text-muted-foreground text-sm italic">Not provided</span>}
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={`${getRoleBadgeColor(user.role)} px-2 py-1`}>
+                      {user.role === 'admin' ? '👑 Admin' : 
+                       user.role === 'staff' ? '👤 Staff' : '👨‍🎓 Student'}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     {user.is_active ? (
-                      <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
-                        Active
-                      </Badge>
+                      <div className="flex items-center">
+                        <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
+                        <span className="text-green-600 font-medium">Active</span>
+                      </div>
                     ) : (
-                      <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200">
-                        Inactive
-                      </Badge>
+                      <div className="flex items-center">
+                        <div className="h-2 w-2 rounded-full bg-gray-300 mr-2"></div>
+                        <span className="text-gray-500 font-medium">Inactive</span>
+                      </div>
                     )}
                   </TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
+                      className="border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
                       onClick={() => handleEditUser(user)}
                     >
                       Edit
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      className="text-red-500 hover:text-red-600"
+                      className="border-red-200 hover:bg-red-50 text-red-500 hover:text-red-600"
                       onClick={() => confirmDeleteUser(user)}
                     >
                       Delete
@@ -348,45 +378,56 @@ export default function UsersPage() {
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
 
       {/* New User Dialog */}
       <Dialog open={isNewUserDialogOpen} onOpenChange={setIsNewUserDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Create New User</DialogTitle>
-            <DialogDescription>
-              Add a new user to the system.
+        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
+          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
+            <DialogTitle className="text-xl font-bold text-white flex items-center">
+              <Users className="mr-2 h-5 w-5" />
+              Create New User
+            </DialogTitle>
+            <DialogDescription className="text-white/80 mt-1">
+              Add a new user to the SCOPE platform
             </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={newUserForm.email}
-                onChange={(e) => setNewUserForm({...newUserForm, email: e.target.value})}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="full_name">Full Name</Label>
-              <Input
-                id="full_name"
-                value={newUserForm.full_name}
-                onChange={(e) => setNewUserForm({...newUserForm, full_name: e.target.value})}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={newUserForm.password}
-                onChange={(e) => setNewUserForm({...newUserForm, password: e.target.value})}
-                required
-              />
+          </div>
+          <div className="p-6">
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="user@example.com"
+                  value={newUserForm.email}
+                  onChange={(e) => setNewUserForm({...newUserForm, email: e.target.value})}
+                  required
+                  className="h-10"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="full_name" className="text-sm font-medium">Full Name</Label>
+                <Input
+                  id="full_name"
+                  value={newUserForm.full_name}
+                  onChange={(e) => setNewUserForm({...newUserForm, full_name: e.target.value})}
+                  placeholder="John Doe"
+                  className="h-10"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={newUserForm.password}
+                  onChange={(e) => setNewUserForm({...newUserForm, password: e.target.value})}
+                  required
+                  className="h-10"
+                />
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="role">Role</Label>

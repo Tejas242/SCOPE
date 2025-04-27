@@ -9,7 +9,7 @@ dependencies = [
     "uvicorn[standard]>=0.23.2",
     "torch>=2.0.1",
     "transformers>=4.34.1",
-    "scikit-learn",
+    "scikit-learn>=1.3.0",
     "pydantic>=2.4.2",
     "pydantic-settings>=2.0.3",
     "python-multipart>=0.0.6",
@@ -27,4 +27,9 @@ dependencies = [
     "numpy>=1.26.0",
     "python-dotenv>=1.0.0",
     "langgraph>=0.3.34",
+    "sentence-transformers>=2.2.2",
+    "matplotlib>=3.7.2",
+    "seaborn>=0.12.2",
+    "plotly>=5.14.0",
+    "wordcloud>=1.9.2",
 ]

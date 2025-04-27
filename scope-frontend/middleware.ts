@@ -5,7 +5,7 @@ export default function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   
   // Define public paths that don't require authentication
-  const isPublicPath = path === '/login';
+  const isPublicPath = path === '/login' || path === '/';
   
   // Define API routes that should be excluded from middleware checks
   const isApiRoute = path.startsWith('/api/');
@@ -19,7 +19,7 @@ export default function middleware(request: NextRequest) {
   }
   
   // If already logged in and trying to access login page, redirect to dashboard
-  if (isPublicPath && token) {
+  if (path === '/login' && token) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
   

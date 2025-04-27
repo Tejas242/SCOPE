@@ -24,7 +24,8 @@ import {
   AlertCircle, 
   Plus, 
   Save,
-  Trash
+  Trash,
+  MessageSquare
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { 
@@ -174,6 +175,9 @@ export default function ComplaintsPage() {
       response: complaint.response || ''
     });
   };
+  
+  // Alias for handleViewComplaint for better semantic naming when clicking on complaint text
+  const handleEdit = handleViewComplaint;
 
   const handleDeleteComplaint = async () => {
     if (!selectedComplaint) return;
@@ -287,11 +291,20 @@ export default function ComplaintsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Complaints</h1>
-        <Button onClick={() => setIsNewComplaintOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> New Complaint
-        </Button>
+      <div className="relative">
+        <div className="absolute -top-12 -left-8 h-16 w-80 bg-blue-500/10 blur-2xl rounded-full -z-10"></div>
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Complaints</h1>
+            <p className="text-muted-foreground mt-1">Manage and track student complaints</p>
+          </div>
+          <Button 
+            onClick={() => setIsNewComplaintOpen(true)}
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+          >
+            <Plus className="mr-2 h-4 w-4" /> New Complaint
+          </Button>
+        </div>
       </div>
 
       {error && (
@@ -302,72 +315,78 @@ export default function ComplaintsPage() {
         </Alert>
       )}
 
-      <div className="flex flex-col md:flex-row gap-4 justify-between">
-        <form onSubmit={handleSearch} className="flex gap-2 flex-1">
-          <Input
-            placeholder="Search complaints..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
-          <Button type="submit" variant="outline" size="icon">
-            <Search className="h-4 w-4" />
-          </Button>
-        </form>
-        
-        <div className="flex gap-2 flex-wrap">
-          <Select 
-            value={categoryFilter || 'all'} 
-            onValueChange={(value) => setCategoryFilter(value === 'all' ? null : value as ComplaintCategory)}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {CATEGORIES.map((category) => (
-                <SelectItem key={category} value={category}>{category}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="bg-card border rounded-lg p-5 shadow-sm">
+        <div className="flex flex-col md:flex-row gap-4 justify-between">
+          <form onSubmit={handleSearch} className="flex gap-2 flex-1">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search complaints..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Button type="submit" variant="secondary">
+              Search
+            </Button>
+          </form>
           
-          <Select 
-            value={urgencyFilter || 'All'} 
-            onValueChange={(value) => setUrgencyFilter(value === 'All' ? null : value as ComplaintUrgency)}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Urgency" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All Urgencies</SelectItem>
-              {URGENCIES.map((urgency) => (
-                <SelectItem key={urgency} value={urgency}>{urgency}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Select 
-            value={statusFilter || 'All'} 
-            onValueChange={(value) => setStatusFilter(value === 'All' ? null : value as ComplaintStatus)}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All Statuses</SelectItem>
-              {STATUSES.map((status) => (
-                <SelectItem key={status} value={status}>{status}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Button variant="ghost" size="icon" onClick={resetFilters}>
-            <X className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2 flex-wrap items-center">
+            <span className="text-sm text-muted-foreground mr-1">Filters:</span>
+            <Select 
+              value={categoryFilter || 'all'} 
+              onValueChange={(value) => setCategoryFilter(value === 'all' ? null : value as ComplaintCategory)}
+            >
+              <SelectTrigger className="w-[150px] h-9 bg-background">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {CATEGORIES.map((category) => (
+                  <SelectItem key={category} value={category}>{category}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select 
+              value={urgencyFilter || 'All'} 
+              onValueChange={(value) => setUrgencyFilter(value === 'All' ? null : value as ComplaintUrgency)}
+            >
+              <SelectTrigger className="w-[150px] h-9 bg-background">
+                <SelectValue placeholder="Urgency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Urgencies</SelectItem>
+                {URGENCIES.map((urgency) => (
+                  <SelectItem key={urgency} value={urgency}>{urgency}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select 
+              value={statusFilter || 'All'} 
+              onValueChange={(value) => setStatusFilter(value === 'All' ? null : value as ComplaintStatus)}
+            >
+              <SelectTrigger className="w-[150px] h-9 bg-background">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Statuses</SelectItem>
+                {STATUSES.map((status) => (
+                  <SelectItem key={status} value={status}>{status}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Button variant="outline" size="sm" onClick={resetFilters} className="h-9">
+              <X className="h-3.5 w-3.5 mr-1" /> Clear
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="border rounded-md">
+      <div className=" overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -398,23 +417,27 @@ export default function ComplaintsPage() {
               </TableRow>
             ) : (
               complaints.map((complaint, index) => (
-                <TableRow key={complaint.id}>
+                <TableRow key={complaint.id} className="hover:bg-muted/30">
                   <TableCell className="font-medium">{(currentPage - 1) * pageSize + index + 1}</TableCell>
                   <TableCell className="max-w-md truncate">
-                    {complaint.complaint_text.length > 100
-                      ? `${complaint.complaint_text.substring(0, 100)}...`
-                      : complaint.complaint_text}
+                    <div className="font-medium hover:text-primary cursor-pointer" onClick={() => handleEdit(complaint)}>
+                      {complaint.complaint_text.length > 80
+                        ? `${complaint.complaint_text.substring(0, 80)}...`
+                        : complaint.complaint_text}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {complaint.category ? (
-                      <Badge variant="outline">{complaint.category}</Badge>
+                      <Badge variant="outline" className="bg-background font-medium">
+                        {complaint.category}
+                      </Badge>
                     ) : (
                       <span className="text-muted-foreground">Not set</span>
                     )}
                   </TableCell>
                   <TableCell>
                     {complaint.urgency ? (
-                      <Badge className={getUrgencyColor(complaint.urgency)}>
+                      <Badge className={`${getUrgencyColor(complaint.urgency)} text-white`}>
                         {complaint.urgency}
                       </Badge>
                     ) : (
@@ -422,18 +445,24 @@ export default function ComplaintsPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge className={getStatusColor(complaint.status)}>
+                    <Badge className={`${getStatusColor(complaint.status)} text-white`}>
                       {complaint.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {new Date(complaint.created_at).toLocaleDateString()}
+                    <div className="flex flex-col">
+                      <span>{new Date(complaint.created_at).toLocaleDateString()}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(complaint.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      </span>
+                    </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleViewComplaint(complaint)}
+                      className="h-8 px-3 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/50 dark:hover:text-blue-400"
                     >
                       View
                     </Button>
@@ -445,13 +474,13 @@ export default function ComplaintsPage() {
         </Table>
         
         {/* Pagination Controls */}
-        <div className="p-4 flex items-center justify-between border-t">
-          <div className="text-sm text-muted-foreground">
-            Showing {complaints.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}-
-            {Math.min(currentPage * pageSize, totalComplaints)} of {totalComplaints} complaints
+        <div className="p-4 flex flex-col sm:flex-row items-center justify-between border-t gap-4">
+          <div className="text-sm text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-md">
+            Showing <span className="font-medium text-foreground">{complaints.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}-
+            {Math.min(currentPage * pageSize, totalComplaints)}</span> of <span className="font-medium text-foreground">{totalComplaints}</span> complaints
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2 flex-wrap justify-center">
             <Select
               value={pageSize.toString()}
               onValueChange={(value) => {
@@ -459,7 +488,7 @@ export default function ComplaintsPage() {
                 setCurrentPage(1);
               }}
             >
-              <SelectTrigger className="w-[100px]">
+              <SelectTrigger className="w-[140px] h-9 bg-background">
                 <SelectValue placeholder="Page size" />
               </SelectTrigger>
               <SelectContent>
@@ -470,42 +499,67 @@ export default function ComplaintsPage() {
               </SelectContent>
             </Select>
             
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </Button>
-            
-            <div className="flex items-center text-sm">
-              Page {currentPage} of {Math.ceil(totalComplaints / pageSize)}
+            <div className="flex items-center border rounded-md overflow-hidden bg-background">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="rounded-none h-9 border-r"
+              >
+                Previous
+              </Button>
+              
+              <div className="flex items-center text-sm px-4 border-r h-9 bg-muted/20">
+                <span className="text-muted-foreground mr-1">Page</span> 
+                <span className="font-medium">{currentPage}</span> 
+                <span className="text-muted-foreground mx-1">of</span> 
+                <span className="font-medium">{Math.ceil(totalComplaints / pageSize)}</span>
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => 
+                  setCurrentPage((prev) => 
+                    Math.min(prev + 1, Math.ceil(totalComplaints / pageSize))
+                  )
+                }
+                disabled={currentPage >= Math.ceil(totalComplaints / pageSize)}
+                className="rounded-none h-9"
+              >
+                Next
+              </Button>
             </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => 
-                setCurrentPage((prev) => 
-                  Math.min(prev + 1, Math.ceil(totalComplaints / pageSize))
-                )
-              }
-              disabled={currentPage >= Math.ceil(totalComplaints / pageSize)}
-            >
-              Next
-            </Button>
           </div>
         </div>
       </div>
+
+      {/* Empty State Enhancement */}
+      {!loading && complaints.length === 0 && !error && (
+        <div className="bg-muted/20 rounded-lg p-8 text-center my-6">
+          <div className="flex flex-col items-center max-w-md mx-auto">
+            <div className="rounded-full bg-primary/10 p-3 mb-4">
+              <FileText className="h-8 w-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">No complaints found</h3>
+            <p className="text-muted-foreground mb-6">
+              There are no complaints matching your current filters. Try changing your search criteria or create a new complaint.
+            </p>
+            <Button onClick={() => setIsNewComplaintOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" /> Create a New Complaint
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* New Complaint Dialog */}
       <Dialog open={isNewComplaintOpen} onOpenChange={setIsNewComplaintOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Create New Complaint</DialogTitle>
-            <DialogDescription>
-              Add a new complaint to the system.
+            <DialogTitle className="text-xl">Create New Complaint</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Add a new complaint to the system for processing.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -536,27 +590,42 @@ export default function ComplaintsPage() {
             </div>
             
             {prediction && (
-              <div className="border rounded-lg p-4 bg-muted/50">
-                <h4 className="font-semibold mb-2">Prediction Results</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Category</p>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">{prediction.category}</Badge>
-                      <Progress value={prediction.confidence_category * 100} className="h-2" />
-                      <span className="text-xs text-muted-foreground">
+              <div className="border rounded-lg p-5 bg-background shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                  <h4 className="font-semibold text-base">AI Prediction Results</h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="bg-muted/30 p-4 rounded-md">
+                    <p className="text-sm font-medium mb-2">Category Prediction</p>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge variant="outline" className="bg-background font-medium">
+                        {prediction.category}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Progress 
+                        value={prediction.confidence_category * 100} 
+                        className="h-2"
+                      />
+                      <span className="text-xs font-medium bg-muted px-2 py-1 rounded-md">
                         {Math.round(prediction.confidence_category * 100)}%
                       </span>
                     </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Urgency</p>
-                    <div className="flex items-center gap-2">
-                      <Badge className={getUrgencyColor(prediction.urgency)}>
+                  <div className="bg-muted/30 p-4 rounded-md">
+                    <p className="text-sm font-medium mb-2">Urgency Prediction</p>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge className={`${getUrgencyColor(prediction.urgency)} text-white`}>
                         {prediction.urgency}
                       </Badge>
-                      <Progress value={prediction.confidence_urgency * 100} className="h-2" />
-                      <span className="text-xs text-muted-foreground">
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Progress 
+                        value={prediction.confidence_urgency * 100} 
+                        className="h-2"
+                      />
+                      <span className="text-xs font-medium bg-muted px-2 py-1 rounded-md">
                         {Math.round(prediction.confidence_urgency * 100)}%
                       </span>
                     </div>
@@ -598,9 +667,15 @@ export default function ComplaintsPage() {
           </DialogHeader>
           
           <Tabs defaultValue="details">
-            <TabsList>
-              <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="response">Response</TabsTrigger>
+            <TabsList className="grid grid-cols-2 mb-4">
+              <TabsTrigger value="details">
+                <FileText className="h-4 w-4 mr-2" />
+                Details
+              </TabsTrigger>
+              <TabsTrigger value="response">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Response
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="details" className="space-y-4">
@@ -691,20 +766,28 @@ export default function ComplaintsPage() {
             </TabsContent>
           </Tabs>
           
-          <DialogFooter className="flex justify-between">
+          <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-4 sm:gap-0 pt-4 border-t">
             <Button 
-              variant="destructive" 
+              variant="outline"
               onClick={() => setIsDeleteConfirmOpen(true)}
-              className="mr-auto"
+              className="mr-auto border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:hover:bg-red-950/30"
             >
               <Trash className="h-4 w-4 mr-2" />
-              Delete
+              Delete Complaint
             </Button>
-            <div className="space-x-2">
-              <Button variant="ghost" onClick={() => setIsEditDialogOpen(false)}>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsEditDialogOpen(false)} 
+                className="flex-1 sm:flex-initial"
+              >
                 Cancel
               </Button>
-              <Button onClick={handleUpdateComplaint} disabled={isSubmitting}>
+              <Button 
+                onClick={handleUpdateComplaint} 
+                disabled={isSubmitting}
+                className="flex-1 sm:flex-initial bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -724,9 +807,12 @@ export default function ComplaintsPage() {
       
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border border-red-200 dark:border-red-900">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash className="h-5 w-5" />
+              Delete Complaint
+            </AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the complaint
               and remove it from the database.
@@ -734,9 +820,13 @@ export default function ComplaintsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteComplaint} disabled={isSubmitting}>
+            <AlertDialogAction 
+              onClick={handleDeleteComplaint} 
+              disabled={isSubmitting}
+              className="bg-red-600 hover:bg-red-700"
+            >
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Delete
+              Yes, delete complaint
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

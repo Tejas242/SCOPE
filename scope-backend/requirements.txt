@@ -30,6 +30,8 @@ sentence-transformers>=2.2.2
 pandas>=2.1.1
 numpy>=1.26.0
 matplotlib>=3.7.2
+seaborn>=0.12.2
+plotly>=5.14.0
 wordcloud>=1.9.2
 
 # Utils
