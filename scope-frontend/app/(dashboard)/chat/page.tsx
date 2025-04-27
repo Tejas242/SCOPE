@@ -85,6 +85,11 @@ export default function ChatPage() {
         setSessionId(response.data.session_id);
       }
       
+      // Ensure we have a valid response
+      if (!response.data || !response.data.response) {
+        throw new Error("Received empty response from server");
+      }
+
       // Remove loading message and add the real response
       setMessages(prev => prev
         // Filter out the loading message
@@ -94,7 +99,7 @@ export default function ChatPage() {
           role: 'assistant',
           content: response.data.response,
           timestamp: new Date(),
-          hasToolCalls: response.data.has_tool_calls,
+          hasToolCalls: response.data.has_tool_calls || false,
           sessionId: response.data.session_id,
           id: Date.now()
         }])
@@ -102,11 +107,25 @@ export default function ChatPage() {
     } catch (error) {
       console.error('Error chatting with assistant:', error);
       const apiError = error as ApiError;
+      
+      // Remove the loading message
+      setMessages(prev => prev.filter(msg => !(msg.isLoading && msg.id === loadingMessageId)));
+      
+      // Show error message to user
       setError(
         apiError.data?.detail || 
         apiError.message || 
         'Failed to communicate with the assistant'
       );
+      
+      // Add error message in chat
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: "Sorry, I encountered an error. Please try again or contact support if the problem persists.",
+        timestamp: new Date(),
+        isError: true,
+        id: Date.now()
+      }]);
     } finally {
       setLoading(false);
     }
@@ -165,7 +184,7 @@ export default function ChatPage() {
                         ? 'bg-primary text-primary-foreground'
                         : msg.isLoading
                           ? 'bg-muted animate-pulse'
-                          : msg.hasToolCalls 
+                          : msg.role === 'assistant' 
                             ? 'bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 shadow-sm' 
                             : 'bg-muted'
                     }`}
@@ -176,12 +195,17 @@ export default function ChatPage() {
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
                       </div>
-                    ) : msg.hasToolCalls ? (
-                      <div className="whitespace-pre-wrap prose dark:prose-invert max-w-none prose-table:border prose-th:border prose-th:p-2 prose-td:border prose-td:p-2 prose-table:border-collapse prose-table:my-2 prose-img:my-0 prose-headings:mb-2 prose-headings:mt-4">
+                    ) : msg.isError ? (
+                      <div className="flex items-center text-red-500">
+                        <AlertCircle className="h-4 w-4 mr-2" />
+                        <div className="whitespace-pre-wrap">{msg.content}</div>
+                      </div>
+                    ) : msg.role === 'assistant' ? (
+                      <div className="whitespace-pre-wrap prose dark:prose-invert max-w-none prose-table:border prose-th:border prose-th:p-2 prose-td:border prose-td:p-2 prose-td:align-middle prose-table:border-collapse prose-table:my-2 prose-img:my-0 prose-headings:mb-2 prose-headings:mt-4">
                         <div dangerouslySetInnerHTML={{ 
-                          __html: marked.parse(msg.content, {
-                            gfm: true,
-                            breaks: true,
+                          __html: marked.parse(msg.content || "No content available", {
+                            gfm: true,            // GitHub Flavored Markdown
+                            breaks: true,         // Add <br> on single line breaks
                           })
                         }} />
                       </div>

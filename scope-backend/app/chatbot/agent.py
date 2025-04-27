@@ -91,6 +91,14 @@ class ChatbotAgent:
             agent_executor = session_data["agent"]
             chat_history = session_data["history"]
             
+            # Ensure the message is not empty to prevent API errors
+            if not message.strip():
+                return {
+                    "response": "I received an empty message. Please provide some text for me to respond to.",
+                    "session_id": session_id,
+                    "has_tool_calls": False
+                }
+                
             # Process the message with explicit message history passing
             result = await agent_executor.ainvoke(
                 {

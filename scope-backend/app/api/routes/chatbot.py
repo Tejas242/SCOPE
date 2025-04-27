@@ -1,4 +1,5 @@
 from typing import Any, List, Optional
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
@@ -33,6 +34,14 @@ async def chat_with_scope(
     Session ID can be provided to continue a conversation, otherwise a new session is created.
     """
     try:
+        # Validate message content
+        if not message.message or not message.message.strip():
+            return {
+                "response": "Please provide a message to chat with the assistant.",
+                "session_id": message.session_id or str(uuid.uuid4()),
+                "has_tool_calls": False
+            }
+            
         chatbot = get_chatbot_agent()
         result = await chatbot.process_message(message=message.message, session_id=message.session_id)
         return result

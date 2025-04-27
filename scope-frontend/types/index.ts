@@ -41,6 +41,7 @@ export interface ChatMessage {
   hasToolCalls?: boolean;  // Flag to indicate if the message contains tool call results
   sessionId?: string;      // Session ID for conversation continuity
   isLoading?: boolean;     // Flag to indicate if this is a loading placeholder
+  isError?: boolean;       // Flag to indicate if this is an error message
   id?: number;             // Unique identifier for the message
 }
 
