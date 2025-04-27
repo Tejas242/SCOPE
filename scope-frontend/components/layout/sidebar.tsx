@@ -16,6 +16,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import LogoutButton from './logout-button';
 
 interface NavItemProps {
   href: string;
@@ -80,17 +81,6 @@ export function Sidebar() {
     },
   ];
 
-  const handleLogout = () => {
-    // Remove from localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    
-    // Remove token from cookies for middleware
-    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    
-    window.location.href = '/login';
-  };
-
   const sidebarContent = (
     <div className="flex flex-col h-full">
       <div className="flex items-center p-4">
@@ -126,10 +116,7 @@ export function Sidebar() {
       </nav>
       
       <div className="p-4">
-        <Button variant="outline" className="w-full justify-start" onClick={handleLogout}>
-          <LogOut size={18} className="mr-2" />
-          Logout
-        </Button>
+        <LogoutButton />
       </div>
     </div>
   );

@@ -30,6 +30,10 @@ const COLORS = [
 export default function CategoryChart({ data, loading }: CategoryChartProps) {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
   
+  // Add debugging console logs
+  console.log('CategoryChart received data:', data);
+  console.log('CategoryChart loading state:', loading);
+  
   if (loading) {
     return (
       <Card className="pt-6">
@@ -40,7 +44,7 @@ export default function CategoryChart({ data, loading }: CategoryChartProps) {
     );
   }
 
-  if (!data || !data.category_urgency.categories.length) {
+  if (!data) {
     return (
       <Card className="pt-6">
         <CardContent>
@@ -51,17 +55,48 @@ export default function CategoryChart({ data, loading }: CategoryChartProps) {
       </Card>
     );
   }
+  
+  // Safeguard against missing or malformed data
+  if (!data.category_urgency?.categories || !Array.isArray(data.category_urgency.categories) || 
+      !data.category_urgency.categories.length ||
+      !data.category_urgency.data || !Array.isArray(data.category_urgency.data)) {
+    console.error('Invalid category data structure:', data);
+    return (
+      <Card className="pt-6">
+        <CardContent>
+          <div className="flex flex-col justify-center items-center h-[300px]">
+            <p className="text-muted-foreground">Category data structure is invalid</p>
+            <p className="text-xs text-muted-foreground mt-2">Check API response format</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-  // Transform the crosstab data for the BarChart
+  // Define proper type for chart data points
+  type ChartDataPoint = {
+    name: string;
+    [key: string]: string | number;
+  };
+
+  // Transform the crosstab data for the BarChart with safer access
   const categoryUrgencyData = data.category_urgency.categories.map((category, categoryIndex) => {
-    const dataPoint: { [key: string]: any } = { name: category };
+    const dataPoint: ChartDataPoint = { name: category };
     
     data.category_urgency.urgency_levels?.forEach((urgency, urgencyIndex) => {
-      dataPoint[urgency] = data.category_urgency.data[categoryIndex][urgencyIndex];
+      if (data.category_urgency.data[categoryIndex] && 
+          typeof data.category_urgency.data[categoryIndex][urgencyIndex] === 'number') {
+        dataPoint[urgency] = data.category_urgency.data[categoryIndex][urgencyIndex];
+      } else {
+        dataPoint[urgency] = 0; // Default to 0 if data is missing
+      }
     });
     
     return dataPoint;
   });
+
+  // Log transformed data to verify
+  console.log('transformed urgency data:', categoryUrgencyData);
 
   const categoryStatusData = data.category_status.categories.map((category, categoryIndex) => {
     const dataPoint: { [key: string]: any } = { name: category };
