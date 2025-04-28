@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -89,7 +89,7 @@ export default function UsersPage() {
     is_active: true
   });
   
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get<User[]>('/api/v1/users/');
@@ -109,7 +109,7 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm]);
   
   useEffect(() => {
     // Get current user role
@@ -125,7 +125,7 @@ export default function UsersPage() {
     }
 
     fetchUsers();
-  }, [router]);
+  }, [fetchUsers, router]);
 
 
   const handleSearch = (e: React.FormEvent) => {

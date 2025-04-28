@@ -5,14 +5,13 @@ from pathlib import Path
 import os
 from app.core.config import settings
 from app.models.domain.complaint import Category, Urgency
-from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing._label import LabelEncoder as LabelEncoderClass
 
 
 class MultiTaskModel(nn.Module):
     def __init__(self, num_genres, num_priority):
         super().__init__()
-        self.enc = AutoModel.from_pretrained('distilbert-base-uncased')
+        self.enc = AutoModel.from_pretrained(settings.MODEL)
         h = self.enc.config.hidden_size
         self.drop = nn.Dropout(0.3)
         self.head_cat = nn.Linear(h, num_genres)
@@ -27,7 +26,7 @@ class MultiTaskModel(nn.Module):
 class ModelPredictor:
     def __init__(self):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.tokenizer = AutoTokenizer.from_pretrained('distilbert-base-uncased')
+        self.tokenizer = AutoTokenizer.from_pretrained(settings.MODEL)
         # Add safe globals for model loading
         torch.serialization.add_safe_globals([
             LabelEncoderClass
