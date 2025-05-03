@@ -1,8 +1,19 @@
-# SCOPE: Student Complaint Optimisation and Prioritization Engine
+# SCOPE Backend
 
-SCOPE is a comprehensive solution for universities to efficiently manage and analyze student complaints with automated classification and prioritization using machine learning.
+This is the backend component of the SCOPE (Student Complaint Optimisation and Prioritization Engine) project, built with FastAPI and Python.
 
-## Project Overview
+## Overview
+
+The SCOPE backend provides a robust API for managing student complaints with powerful analytics, AI-driven insights, and advanced data processing capabilities. It serves as the core of the SCOPE system, handling everything from user authentication to machine learning predictions.
+
+## Tech Stack
+
+- **FastAPI**: High-performance web framework for building APIs
+- **SQLAlchemy**: ORM for database interactions
+- **Pydantic**: Data validation and settings management
+- **Langchain**: Framework for building applications with LLMs
+- **Google Gemini**: Advanced AI model for natural language processing
+- **PyTorch/Transformers**: Machine learning framework for text classification
 
 The system uses a multi-task deep learning model based on DistilBERT to simultaneously classify complaints by genre (category) and priority level. This backend service provides RESTful APIs for processing individual complaints or batch processing multiple complaints.
 

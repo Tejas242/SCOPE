@@ -21,3 +21,6 @@ model/*
 # sqlite database
 *.sqlite3
 *.db
+
+# Environment variables
+*.env
