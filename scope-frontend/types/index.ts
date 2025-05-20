@@ -7,7 +7,7 @@ export interface User {
   is_active: boolean;
 }
 
-export type UserRole = 'admin' | 'staff' | 'student';
+export type UserRole = "admin" | "staff" | "student";
 
 // Complaint related types
 export interface Complaint {
@@ -22,9 +22,17 @@ export interface Complaint {
   response: string | null;
 }
 
-export type ComplaintCategory = 'Academic' | 'Facilities' | 'Housing' | 'IT Support' | 'Financial Aid' | 'Campus Life' | 'Other';
-export type ComplaintUrgency = 'Low' | 'Medium' | 'High' | 'Critical';
-export type ComplaintStatus = 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+export type ComplaintCategory =
+  | "Academic"
+  | "Facilities"
+  | "Housing"
+  | "IT Support"
+  | "Financial Aid"
+  | "Campus Life"
+  | "Dining Services"
+  | "Other";
+export type ComplaintUrgency = "Low" | "Medium" | "High" | "Critical";
+export type ComplaintStatus = "Open" | "In Progress" | "Resolved" | "Closed";
 
 export interface ComplaintPrediction {
   category: ComplaintCategory;
@@ -35,14 +43,14 @@ export interface ComplaintPrediction {
 
 // Chat related types
 export interface ChatMessage {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: Date;
-  hasToolCalls?: boolean;  // Flag to indicate if the message contains tool call results
-  sessionId?: string;      // Session ID for conversation continuity
-  isLoading?: boolean;     // Flag to indicate if this is a loading placeholder
-  isError?: boolean;       // Flag to indicate if this is an error message
-  id?: number;             // Unique identifier for the message
+  hasToolCalls?: boolean; // Flag to indicate if the message contains tool call results
+  sessionId?: string; // Session ID for conversation continuity
+  isLoading?: boolean; // Flag to indicate if this is a loading placeholder
+  isError?: boolean; // Flag to indicate if this is an error message
+  id?: number; // Unique identifier for the message
 }
 
 // Dashboard stats types

@@ -12,8 +12,8 @@ class Category(str, enum.Enum):
     IT_SUPPORT = "IT Support"
     FINANCIAL_AID = "Financial Aid"
     CAMPUS_LIFE = "Campus Life"
+    DINING_SERVICES = "Dining Services"
     OTHER = "Other"
-
 
 class Urgency(str, enum.Enum):
     LOW = "Low"
