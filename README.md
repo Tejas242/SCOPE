@@ -108,10 +108,6 @@
 *   **ML Model:**
     *   Fine-tuned DistilBERT/RoBERTa (Multi-task classification)
 
-## 🖼️ Interface Preview
-
-> Will be added later
-
 ## 🚀 Getting Started (Local Setup)
 
 Follow these steps to set up and run the SCOPE project locally.
