@@ -31,6 +31,58 @@
 *   **⚙️ Full-Stack Architecture:** Robust FastAPI backend and a modern Next.js frontend with TypeScript.
 *   **📈 Data Analytics:** Endpoints for analyzing trends, identifying high-priority issues, and exploring common complaint topics.
 
+## Screenshots 
+
+<div align="center">
+
+<details>
+<summary>📸 <strong>View Screenshots</strong></summary>
+
+<br>
+
+**🏠 Landing Page**
+![Landing Page](./scope-frontend/public/screenshots/landing.png)
+*Welcome to SCOPE - Your intelligent complaint management system*
+
+<br>
+
+**🎯 Features Overview**
+![Features Overview](./scope-frontend/public/screenshots/features.png)
+*Comprehensive feature set for efficient complaint handling*
+
+<br>
+
+**📊 Analytics Dashboard**
+![Analytics Dashboard](./scope-frontend/public/screenshots/analytics-dash.png)
+*Real-time insights and data visualization for informed decision-making*
+
+<br>
+
+**🧠 AI-Powered Classification & Prioritization**
+![Complaint Classification & Prioritization](./scope-frontend/public/screenshots/complaint-classification-prioritization.png)
+*Automated complaint categorization and urgency assessment*
+
+<br>
+
+**👥 User Management System**
+![User Management](./scope-frontend/public/screenshots/user-management.png)
+*Role-based access control and user administration*
+
+<br>
+
+**🤖 AI Chatbot Assistant**
+![Chatbot Features](./scope-frontend/public/screenshots/chatbot-features.png)
+*Advanced RAG-based features for complaint data analysis*
+![Chatbot Demo](./scope-frontend/public/screenshots/chatbot-demo.png)
+*Interactive AI assistant powered by Google Gemini and LangChain*
+<br>
+
+
+</details>
+
+</div>
+
+
 ## 🛠️ Tech Stack
 
 *   **Backend:**
