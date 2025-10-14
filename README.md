@@ -124,6 +124,14 @@ Follow these steps to set up and run the SCOPE project locally.
 *   Access to a terminal or command prompt
 
 **1. Clone the Repository:**
+```bash
+git clone https://github.com/tejas242/SCOPE.git
+```
+
+#### 1.1 Get the model.pt
+Use the jupyter-notebook at `notebooks/Model_SCOPE.ipynb` and the dataset in `data/complaints.csv` to train the model and download and store it in the `model/model.pt` file.
+
+The model is too large to upload to github repo.
 
 **2. Backend Setup (FastAPI):**
 

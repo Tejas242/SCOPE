@@ -55,14 +55,7 @@ scope-backend/
 
 ## Getting Started
 
-### 1. Clone the repository
-
-```sh
-git clone https://github.com/yourusername/scope-backend.git
-cd scope-backend
-```
-
-#### 1.1 Get the model.pt
+### 1. Get the model.pt
 Use the jupyter-notebook at `notebooks/Model_SCOPE.ipynb` and the dataset in `data/complaints.csv` to train the model and download and store it in the `model/model.pt` file.
 
 The model is too large to upload to github repo.
