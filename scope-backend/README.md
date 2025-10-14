@@ -53,6 +53,52 @@ scope-backend/
 - Python 3.9+ 
 - Google API Key (for Gemini API)
 
+## Getting Started
+
+### 1. Clone the repository
+
+```sh
+git clone https://github.com/yourusername/scope-backend.git
+cd scope-backend
+```
+
+## 1.1 Get the model.pt
+Use the jupyter-notebook at `notebooks/Model_SCOPE.ipynb` and the dataset in `data/complaints.csv` to train the model and download and store it in the `model/model.pt` file.
+
+The model is too large to upload to github repo.
+
+### 2. Create a virtual environment and install dependencies
+
+```sh
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 3. Set up environment variables
+
+Copy the example environment file and update it with your settings:
+
+```sh
+cp app/.env.example .env
+```
+
+Edit the `.env` file to include your Google API key and other settings.
+
+### 4. Seed the database with sample data
+
+```sh
+python scripts/seed_data.py data/complaints-small.csv
+```
+
+### 5. Start the server
+
+```sh
+uvicorn main:app --reload
+```
+
+The API will be available at http://localhost:8000
+
 ### 6. Access API documentation
 
 Open your browser and navigate to http://localhost:8000/docs to view the Swagger UI documentation.
@@ -91,3 +137,14 @@ Open your browser and navigate to http://localhost:8000/docs to view the Swagger
 - Admin: admin@example.com / adminpassword
 - Staff: staff@example.com / staffpassword
 - Student: student@example.com / studentpassword
+
+## Future Enhancements
+
+- Integration with front-end dashboard
+- Email notifications for high-priority complaints
+- More sophisticated analytics and reporting
+- Enhanced chatbot capabilities with more tools
+
+## License
+
+[MIT License](LICENSE)

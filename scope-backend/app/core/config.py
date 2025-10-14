@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     
     # ML Model Settings
     MODEL_PATH: str = "model/model.pt"
-    MODEL: str = 'roberta-base'
+    MODEL: str = 'distilbert-base-uncased'
     
     class Config:
         case_sensitive = True
